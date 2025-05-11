@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+        - .env
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    network_mode: service:rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:4.1-management
+    env_file:
+      - .env
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  mailpit:
+    image: axllent/mailpit
+    environment:
+      - MP_SMTP_AUTH_ALLOW_INSECURE=true
+      - MP_SMTP_AUTH="mailuser:password"
+    network_mode: service:rabbitmq
+
+volumes:
+  rabbitmq_data:
